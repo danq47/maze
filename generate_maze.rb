@@ -3,7 +3,7 @@ class Maze
   # Define some class variables
   @@length = 2
   @@width = 2
-  attr_reader :visited, :grid, :current_location# won't want this in the end, it's just for debugging along the way
+  attr_reader :visited, :grid, :current_location, :route# won't want this in the end, it's just for debugging along the way
 
   def initialize
     @current_location = [0,0] # (0,0) is bottom left corner
@@ -13,6 +13,7 @@ class Maze
 # The only ones that we can't remove are outer walls (i.e. the north wall on the top row etc)
     @visited = Array.new(@@length){Array.new(@@width) {0}} # array of all squares in grid - 0 means not visited, 1 means visited
     @visited[0][0] = 1 # origin starts as visited
+    @route = [[0,0]] # Keep track of our route so we can backtrack
   end
 
 # check point is within our defined ranges
@@ -37,6 +38,7 @@ class Maze
     raise ArgumentError if not valid_point(x,y)
     neighbours = unvisited_neighbours(x,y)
     @current_location = neighbours.values.sample
+    @route.append(@current_location) # add to route so we can backtrack
     delete_wall(x,y,@current_location[0],@current_location[1])
     @visited[@current_location[1]][@current_location[0]] = 1
   end
@@ -47,12 +49,23 @@ class Maze
     walls_to_delete = Hash[ [1,0] => ["E","W"], [-1,0] => ["W","E"], [0,1] => ["N","S"], [0,-1] => ["S","N"] ]
     @grid[y1][x1].delete(walls_to_delete[move][0])
     @grid[y2][x2].delete(walls_to_delete[move][1])
-end
+  end
+
+  def backtrack
+    @route.pop
+    @current_location = @route[-1]
+  end
 
 end
 
-m1 = Maze.new
-p m1.move_to_unvisited_neighbour(0,0)
+# m1 = Maze.new
 
-p m1.visited
-p m1.grid
+# while m1.route != []
+#   while 
+
+
+# m1 = Maze.new
+# p m1.move_to_unvisited_neighbour(0,0)
+
+# p m1.visited
+# p m1.grid
