@@ -1,8 +1,8 @@
 # Going to write maze as a class
 class Maze
   # Define some class variables
-  @@length = 2
-  @@width = 2
+  @@length = 10
+  @@width = 10
   attr_reader :visited, :grid, :current_location, :route# won't want this in the end, it's just for debugging along the way
 
   def initialize
@@ -63,11 +63,46 @@ class Maze
     @current_location = @route[-1]
   end
 
+  def print_maze
+    output = ""
+    output << " " << "_" * (@@width * 2 - 1) << "\n"
+    (@@length-1).times do
+      output << "|" << " " * (@@width * 2 - 1) << "|\n"
+    end
+    output << "|" << "_" * (@@width * 2 - 1) << "|\n"
+    # puts output
+    # blank_maze = output.split("\n")
+
+  end
+
+  def print_maze2
+
+    output = []
+    @grid.each {|y| 
+      line = "|"
+      y.each { |x| # skip final one, as we know that it will have a 
+        if x.include? "E" and x.include? "S" # put in east and north walls
+          line << "_|"
+        elsif x.include? "E" and not x.include? "S"
+          line << " |"
+        elsif x.include? "S" and not x.include? "E"
+          line << "__"
+        else
+          line << "  "
+        end }
+      line << "\n" 
+
+      output.push(line) } 
+
+    upper_border = " " << "_" * (@@width * 2 - 1) <<"\n"
+    output.push(upper_border)
+    output.reverse!
+
+  end
+
 end
 
 m1 = Maze.new
-# p m1.route == [[0,0]]
-# p m1.unvisited_neighbours
 
 while m1.route != []
   while m1.unvisited_neighbours != {}
@@ -77,3 +112,4 @@ while m1.route != []
 end
 
 p m1.grid
+puts m1.print_maze2
