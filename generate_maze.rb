@@ -1,9 +1,10 @@
+require 'histogram/array'
 # Going to write maze as a class
 class Maze
   # Define some class variables
-  @@length = 5
-  @@width = 5
-  attr_reader :visited, :grid, :current_location, :route# won't want this in the end, it's just for debugging along the way
+  @@length = 100
+  @@width = 100
+  attr_reader :visited, :grid, :current_location, :route, :length_to_solve  # won't want this in the end, it's just for debugging along the way
 
   def initialize
     @grid = Array.new(@@length){Array.new(@@width) {["N","S","E","W"]}}
@@ -152,7 +153,7 @@ class Maze
 # Also maybe there is a smart way to choose which initial direction to go in
     left_turn = Hash[ "N" => "W", "W" => "S", "S" => "E", "E" => "N"] # this is what happens to our @facing direction
     right_turn = left_turn.invert # this is a new hash, with the opposite directions
-    p @facing
+
     if can_turn_left
       @facing = left_turn[@facing]
       move_forward
@@ -169,15 +170,25 @@ class Maze
   end
 
   def lhr_algorithm
-    p "Start:#{@maze_start},End:#{@maze_end}"
+    # p "Start:#{@maze_start},End:#{@maze_end}"
     while @current_location_solution != @maze_end
       left_hand_rule
-      p "Current location:#{@current_location_solution}"
+      # p "Current location:#{@current_location_solution}"
     end
+    @length_to_solve = @route_to_finish.length - 1 # minus 1 because we don't count our starting spot
+    # p "length_to_solve = #{@route_to_finish.length}"
   end
 
 end
 
-m1 = Maze.new
-puts m1.print_maze
-m1.lhr_algorithm
+
+solution_time=[]
+10.times do
+  m1 = Maze.new
+  # puts m1.print_maze
+  m1.lhr_algorithm
+  solution_time.push(m1.length_to_solve)
+end
+
+# out = open("results.txt","w")
+# solution_time.each {|x| out.write(x); out.write("\n") }
