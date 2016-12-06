@@ -16,6 +16,7 @@ class Maze
     @visited[@start[1]][@start[0]] = 1
     @route = [visited[@start[1]][@start[0]]] # Keep track of our route so we can backtrack
     generate_maze
+    add_start_and_finish
   end
 
 # check point is within our defined ranges
@@ -74,6 +75,12 @@ class Maze
     end
   end
 
+  def add_start_and_finish
+# Add a start and finish to the maze so that we can start to look at solving it
+    @maze_start = [(0...@@width).to_a.sample,(0...@@length).to_a.sample]
+    @maze_end = [(0...@@width).to_a.sample,(0...@@length).to_a.sample]
+  end
+
   def print_maze
 
     output = []
@@ -101,8 +108,11 @@ class Maze
 
 end
 
-m1 = Maze.new
-puts m1.print_maze
+# m1 = Maze.new
 
-out = open("maze.txt","w")
-m1.print_maze.each { |line| out.write(line) }
+# # puts m1.print_maze
+
+# # puts "test"
+
+# # out = open("maze.txt","w")
+# # m1.print_maze.each { |line| out.write(line) }
