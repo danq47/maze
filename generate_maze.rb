@@ -1,19 +1,20 @@
 # Going to write maze as a class
 class Maze
   # Define some class variables
-  @@length = 10
-  @@width = 10
+  @@length = 20
+  @@width = 20
   attr_reader :visited, :grid, :current_location, :route# won't want this in the end, it's just for debugging along the way
 
   def initialize
-    @current_location = [0,0] # (0,0) is bottom left corner
     @grid = Array.new(@@length){Array.new(@@width) {["N","S","E","W"]}}
 # Each point on the grid has 4 attributes - i.e. a wall on the north, south, east, west.
 # These are all there to start, however, we can get rid of them as we go
 # The only ones that we can't remove are outer walls (i.e. the north wall on the top row etc)
     @visited = Array.new(@@length){Array.new(@@width) {0}} # array of all squares in grid - 0 means not visited, 1 means visited
-    @visited[0][0] = 1 # origin starts as visited
-    @route = [[0,0]] # Keep track of our route so we can backtrack
+    @start = [(0...@@width).to_a.sample,(0...@@length).to_a.sample] # Choose a random point to start
+    @current_location = @start
+    @visited[@start[1]][@start[0]] = 1
+    @route = [visited[@start[1]][@start[0]]] # Keep track of our route so we can backtrack
   end
 
 # check point is within our defined ranges
@@ -64,18 +65,6 @@ class Maze
   end
 
   def print_maze
-    output = ""
-    output << " " << "_" * (@@width * 2 - 1) << "\n"
-    (@@length-1).times do
-      output << "|" << " " * (@@width * 2 - 1) << "|\n"
-    end
-    output << "|" << "_" * (@@width * 2 - 1) << "|\n"
-    # puts output
-    # blank_maze = output.split("\n")
-
-  end
-
-  def print_maze2
 
     output = []
     @grid.each {|y| 
@@ -111,5 +100,5 @@ while m1.route != []
   m1.backtrack
 end
 
-p m1.grid
-puts m1.print_maze2
+puts m1.print_maze
+
