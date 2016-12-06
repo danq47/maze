@@ -100,5 +100,9 @@ while m1.route != []
   m1.backtrack
 end
 
-puts m1.print_maze
+
+out = open("maze.txt","w")
+m1.print_maze.each { |line| out.write(line) }
+# File.open(m1, 'w') { |file| file.write(p m1.print_maze) }
+
 
