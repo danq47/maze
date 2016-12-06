@@ -1,8 +1,8 @@
 # Going to write maze as a class
 class Maze
   # Define some class variables
-  @@length = 20
-  @@width = 20
+  @@length = 5
+  @@width = 5
   attr_reader :visited, :grid, :current_location, :route# won't want this in the end, it's just for debugging along the way
 
   def initialize
@@ -17,6 +17,9 @@ class Maze
     @route = [visited[@start[1]][@start[0]]] # Keep track of our route so we can backtrack
     generate_maze
     add_start_and_finish
+    @facing = "N" # we start facing north (maybe later we can change this)
+    @current_location_solution = @maze_start
+    @route_to_finish = [@maze_start] # This will be how many steps it takes to get from the start to the finish
   end
 
 # check point is within our defined ranges
@@ -42,14 +45,11 @@ class Maze
   def move_to_unvisited_neighbour
     x = @current_location[0]
     y = @current_location[1]
-    # p "x:#{x},y:#{y},cx:#{current_location[0]},cy:#{current_location[1]}"
     raise ArgumentError if not valid_point(x,y)
     neighbours = unvisited_neighbours
     @current_location = neighbours.values.sample
-    # p "x:#{x},y:#{y},cx:#{current_location[0]},cy:#{current_location[1]}"
     @route.push(@current_location) # add to route so we can backtrack
     delete_wall(x,y,@current_location[0],@current_location[1])
-    # p "x:#{x},y:#{y},cx:#{current_location[0]},cy:#{current_location[1]}"
     @visited[@current_location[1]][@current_location[0]] = 1
   end
 
@@ -106,13 +106,78 @@ class Maze
 
   end
 
+  def can_turn_left
+# We need to check if a different wall exisits depending on which way we are facing
+    wall_to_check = Hash[ "N" => "W", "W" => "S", "S" => "E", "E" => "N"]
+    if @grid[@current_location_solution[1]][@current_location_solution[0]].include? wall_to_check[@facing]
+      return false
+    else
+      return true
+    end
+  end
+
+  def can_go_straight
+    if @grid[@current_location_solution[1]][@current_location_solution[0]].include? @facing
+      return false
+    else
+      return true
+    end
+  end
+
+  def can_turn_right
+# We need to check if a different wall exisits depending on which way we are facing
+    wall_to_check = Hash[ "N" => "E", "W" => "N", "S" => "W", "E" => "S"]
+    if @grid[@current_location_solution[1]][@current_location_solution[0]].include? wall_to_check[@facing]
+      return false
+    else
+      return true
+    end
+  end
+
+  def move_forward
+    move = Hash[ "N" => [@current_location_solution[0],@current_location_solution[1]+1],
+    "W" => [@current_location_solution[0]-1,@current_location_solution[1]], 
+    "S" => [@current_location_solution[0],@current_location_solution[1]-1],
+    "E" => [@current_location_solution[0]+1,@current_location_solution[1]] ]
+    @current_location_solution = move[@facing]
+    @route_to_finish.push(@current_location_solution)
+  end
+
+  def left_hand_rule
+# We will implement a rule where we always keep our left hand on the wall.
+# Therefore, if we CAN turn left, we will
+# Will implement this by doing a change of compass directions and then moving forward one space
+# To start, we will implement this in the most basic way possible, but we can improve later on
+# For example, if the goal is in the line of sight, ignore the algorithm and simply move towards it
+# Also maybe there is a smart way to choose which initial direction to go in
+    left_turn = Hash[ "N" => "W", "W" => "S", "S" => "E", "E" => "N"] # this is what happens to our @facing direction
+    right_turn = left_turn.invert # this is a new hash, with the opposite directions
+    p @facing
+    if can_turn_left
+      @facing = left_turn[@facing]
+      move_forward
+    elsif can_go_straight
+      # no_turn
+      move_forward
+    elsif can_turn_right
+      @facing = right_turn[@facing]
+      move_forward
+    else
+      @facing = left_turn[left_turn[@facing]]
+      move_forward
+    end
+  end
+
+  def lhr_algorithm
+    p "Start:#{@maze_start},End:#{@maze_end}"
+    while @current_location_solution != @maze_end
+      left_hand_rule
+      p "Current location:#{@current_location_solution}"
+    end
+  end
+
 end
 
-# m1 = Maze.new
-
-# # puts m1.print_maze
-
-# # puts "test"
-
-# # out = open("maze.txt","w")
-# # m1.print_maze.each { |line| out.write(line) }
+m1 = Maze.new
+puts m1.print_maze
+m1.lhr_algorithm
