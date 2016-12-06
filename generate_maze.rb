@@ -26,7 +26,9 @@ class Maze
   end
 
 # Find which neighbours are unvisited
-  def unvisited_neighbours(x,y)
+  def unvisited_neighbours
+    x = @current_location[0]
+    y = @current_location[1]
     raise ArgumentError if not valid_point(x,y)
     neighbours = Hash[ "N" => [x,y+1], "S" => [x,y-1], "E" => [x+1,y], "W" => [x-1,y] ]
     neighbours.delete_if { |key, value| not valid_point(value[0],value[1]) }
@@ -34,12 +36,17 @@ class Maze
   end
 
 # takes input as old current location (x,y), and moves to new current location (@current_location[0],@current_location[1])
-  def move_to_unvisited_neighbour(x,y) 
+  def move_to_unvisited_neighbour
+    x = @current_location[0]
+    y = @current_location[1]
+    # p "x:#{x},y:#{y},cx:#{current_location[0]},cy:#{current_location[1]}"
     raise ArgumentError if not valid_point(x,y)
-    neighbours = unvisited_neighbours(x,y)
+    neighbours = unvisited_neighbours
     @current_location = neighbours.values.sample
-    @route.append(@current_location) # add to route so we can backtrack
+    # p "x:#{x},y:#{y},cx:#{current_location[0]},cy:#{current_location[1]}"
+    @route.push(@current_location) # add to route so we can backtrack
     delete_wall(x,y,@current_location[0],@current_location[1])
+    # p "x:#{x},y:#{y},cx:#{current_location[0]},cy:#{current_location[1]}"
     @visited[@current_location[1]][@current_location[0]] = 1
   end
 
@@ -58,14 +65,15 @@ class Maze
 
 end
 
-# m1 = Maze.new
+m1 = Maze.new
+# p m1.route == [[0,0]]
+# p m1.unvisited_neighbours
 
-# while m1.route != []
-#   while 
+while m1.route != []
+  while m1.unvisited_neighbours != {}
+    m1.move_to_unvisited_neighbour
+  end
+  m1.backtrack
+end
 
-
-# m1 = Maze.new
-# p m1.move_to_unvisited_neighbour(0,0)
-
-# p m1.visited
-# p m1.grid
+p m1.grid
