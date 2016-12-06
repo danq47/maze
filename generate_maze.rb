@@ -15,6 +15,7 @@ class Maze
     @current_location = @start
     @visited[@start[1]][@start[0]] = 1
     @route = [visited[@start[1]][@start[0]]] # Keep track of our route so we can backtrack
+    generate_maze
   end
 
 # check point is within our defined ranges
@@ -64,6 +65,15 @@ class Maze
     @current_location = @route[-1]
   end
 
+  def generate_maze
+    while route != []
+      while unvisited_neighbours != {}
+        move_to_unvisited_neighbour
+      end
+      backtrack
+    end
+  end
+
   def print_maze
 
     output = []
@@ -92,17 +102,7 @@ class Maze
 end
 
 m1 = Maze.new
-
-while m1.route != []
-  while m1.unvisited_neighbours != {}
-    m1.move_to_unvisited_neighbour
-  end
-  m1.backtrack
-end
-
+puts m1.print_maze
 
 out = open("maze.txt","w")
 m1.print_maze.each { |line| out.write(line) }
-# File.open(m1, 'w') { |file| file.write(p m1.print_maze) }
-
-
