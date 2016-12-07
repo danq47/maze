@@ -2,8 +2,8 @@ require 'histogram/array'
 # Going to write maze as a class
 class Maze
   # Define some class variables
-  @@length = 100
-  @@width = 100
+  @@length = 10
+  @@width = 10
   attr_reader :visited, :grid, :current_location, :route, :length_to_solve  # won't want this in the end, it's just for debugging along the way
 
   def initialize
@@ -181,14 +181,42 @@ class Maze
 
 end
 
+def mean(arr)
+  len = arr.length
+  tmp = 0.0
+  arr.each { |x| tmp += x }
+  tmp = tmp/len
+  return tmp
+end
+
+def median(arr)
+  len = arr.length
+  return arr.sort![len/2]
+end
+
+def variance(arr)
+  len = arr.length * 1.0
+  tmp = 0.0
+  arr.each { |x| tmp += (x - mean(arr))**2.0 }
+  tmp = (1.0*tmp)/len
+  return tmp
+end
+
+def std(arr)
+  variance(arr)**0.5
+end
 
 solution_time=[]
-10.times do
+10000.times do
   m1 = Maze.new
   # puts m1.print_maze
   m1.lhr_algorithm
   solution_time.push(m1.length_to_solve)
 end
+
+p "mean:#{mean(solution_time)}"
+p "median:#{median(solution_time)}"
+p "standard deviation:#{std(solution_time)}"
 
 # out = open("results.txt","w")
 # solution_time.each {|x| out.write(x); out.write("\n") }
